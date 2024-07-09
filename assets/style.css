@@ -3114,7 +3114,7 @@ body .padding-ourblog{
     position: absolute;
     top: 50%;
     left: 50%;
-    background: url("images/play.png") center center no-repeat transparent;
+    background: url("assets/images/play.png") center center no-repeat transparent;
     width: 64px;
     height: 64px;
     border: 0;
@@ -8537,7 +8537,7 @@ body  .ktoggler i{
 }
 .kcol-category-icon a .kicon {
     background-color: transparent;
-    background-image: url("images/kicon.png");
+    background-image: url("assets/images/kicon.png");
     background-position: center center;
     background-repeat: no-repeat;
     display: inline-block;
@@ -8619,7 +8619,7 @@ body  .ktoggler i{
     display: block;
     width: 46px;
     height: 40px;
-    background-image: url('images/who_is_online.png');
+    background-image: url('assets/images/who_is_online.png');
     background-position: center center;
     background-repeat: no-repeat;
     background-color: transparent;
@@ -8645,7 +8645,7 @@ body .kwhoisonline .kcol-mid{
     display: block;
     width: 46px;
     height: 40px;
-    background-image: url('images/stats.png');
+    background-image: url('assets/images/stats.png');
     background-position: center center;
     background-repeat: no-repeat;
     background-color: transparent;

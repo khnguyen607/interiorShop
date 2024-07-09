@@ -1,0 +1,15 @@
+{
+    "backend": "http://localhost:3000/backend/",
+    "script" : [
+        "assets/js/jquery.min.js",
+        "assets/js/bootstrap.min.js",
+        "assets/js/jquery.parallax-1.1.3.js",
+        "assets/js/owl.carousel.js",
+        "assets/js/resize.js",
+        "assets/js/off-canvas.js",
+        "assets/js/jquery.isotope.min.js",
+        "assets/js/custom-portfolio.js",
+        "assets/js/jquery.easypiechart.min.js"
+    ]
+}
+  
