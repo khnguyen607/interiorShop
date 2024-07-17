@@ -1,0 +1,170 @@
+document.addEventListener('DOMContentLoaded', async () => {
+    await Helper.fetchBackendLink();
+    // await Helper.fetchBackendLink();
+    // Đổ danh sách sản phẩm
+    _init();
+    _showCategories();
+})
+
+async function _init() {
+    var items = await Helper.fetchData("product")
+    console.log(items);
+    // if (Helper.getParameter('q')) document.querySelector(".sidebar-search input").value = Helper.getParameter('q')
+    filterBy(items)
+}
+
+async function showDatas(items) {
+    var dataList = document.querySelector(".dataList")
+    var dataItem = dataList.querySelector(".dataItem").cloneNode(true)
+    dataList.innerHTML = ""
+    await items.forEach(item => {
+        let cloneData = dataItem.cloneNode(true)
+
+        cloneData.querySelector("._hrefProductDetail").textContent = item.Name
+        cloneData.querySelectorAll("a._hrefProductDetail").forEach(i => i.href = `./?page=productDetails&id=${item.ID}`)
+        cloneData.querySelector("img").src = Helper.getLink(item.Img)
+        cloneData.querySelector("small").textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.Price * 1000)
+
+        cloneData.querySelector("._addCart").addEventListener("click", () => {
+            CartManager.setItem(
+                item.Name,
+                {
+                    Price: item.Price,
+                    Unit: item.Unit,
+                    Img: item.Img,
+                    Quantity: 1,
+                    ID: item.ID
+                })
+            console.log(CartManager.getItem());
+        })
+
+        dataList.appendChild(cloneData)
+    });
+
+
+}
+
+async function _showCategories() {
+    var items = await Helper.fetchData("category")
+    var dataList = document.querySelector(".sidebar-list")
+    dataList.innerHTML = ""
+    items.forEach(item => {
+        let dataItem = document.createElement("li")
+        dataItem.innerHTML = `
+            <i class="fa fa-chevron-right"></i>
+            <a href="./?page=products&category=${item.Name}"> ${item.Name}</a>
+        `
+        dataList.appendChild(dataItem)
+    })
+}
+
+function chunkArray(array, chunkSize) {
+    let result = [];
+    let j = 1;
+    for (let i = 0; i < array.length; i += chunkSize) {
+        let chunk = array.slice(i, i + chunkSize);
+        result[j] = chunk
+        j++
+    }
+    return result;
+}
+
+async function filterBy(items) {
+    runMain(items)
+    async function runMain(items) {
+        var items = items.filter(item => {
+            if (!byName(item.Name)) return false
+            if (!byCategories(item.categoriesValue)) return false
+            return true
+        })
+        let chunkItem = chunkArray(items, 6)
+        new Pagination(chunkItem);
+        showDatas(chunkItem[1])
+    }
+
+    // Lọc theo tên
+    function byName(name) {
+        if (!Helper.getParameter("q")) return true
+        if (!name) return false
+        var nameValue = Helper.getParameter("q")
+        if (name.toLowerCase().includes(nameValue.toLowerCase())) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    function byCategories(name) {
+        if (!Helper.getParameter("category")) return true
+        if (!name) return false
+        var nameValue = Helper.getParameter("category")
+        if (name.toLowerCase().includes(nameValue.toLowerCase())) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+}
+
+class Pagination {
+    static curentPage = 1
+    static items = null
+    constructor(items) {
+        Pagination.items = items
+        this.displayPagination()
+        this.eventListeners()
+        Pagination.displayPage()
+    }
+
+    static async displayPage() {
+        document.querySelectorAll(".page-pagination li[data-pageIndex]").forEach(item => {
+            item.classList.remove("active")
+        });
+        document.querySelector(`.page-pagination li[data-pageIndex="${Pagination.curentPage}"]`).classList.add("active")
+        showDatas(Pagination.items[Pagination.curentPage])
+
+    }
+
+    eventListeners() {
+        document.querySelectorAll(".page-pagination li[data-pageIndex]").forEach(item => {
+            item.addEventListener("click", () => {
+                Pagination.curentPage = parseInt(item.getAttribute("data-pageIndex"));
+                Pagination.displayPage();
+            });
+        });
+        document.querySelector(".page-pagination .prev").addEventListener("click", () => {
+            if (Pagination.curentPage > 1) {
+                Pagination.curentPage--;
+                Pagination.displayPage();
+            }
+        })
+        document.querySelector(".page-pagination .next").addEventListener("click", () => {
+            if (Pagination.curentPage < document.querySelectorAll(".page-pagination li[data-pageIndex]").length) {
+                Pagination.curentPage++;
+                Pagination.displayPage();
+            }
+        })
+    }
+
+    displayPagination() {
+        var prev = document.createElement("li")
+        prev.classList.add("prev")
+        prev.innerHTML = `<a href="javascript:void(0);"><i class="fa fa-angle-left"></i></a>`
+        var next = document.createElement("li")
+        next.classList.add("next")
+        next.innerHTML = `<a href="javascript:void(0);"><i class="fa fa-angle-right"></i></a>`
+
+        var paginations = document.querySelector(".page-pagination")
+        paginations.innerHTML = ""
+        paginations.appendChild(prev)
+        for (let i = 1; i < Pagination.items.length; i++) {
+            var pagination = document.createElement("li")
+            pagination.setAttribute("data-pageIndex", i)
+            pagination.innerHTML = `<a href="javascript:void(0);">${i}</a>`
+            paginations.appendChild(pagination)
+        }
+        paginations.appendChild(next)
+    }
+}
+
